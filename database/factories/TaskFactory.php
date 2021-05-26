@@ -22,7 +22,10 @@ class TaskFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'name' => $this->faker->name(),
+            'card_id' => $this->faker->numberBetween(1,50),
+            'created_at'=>$this->faker->dateTime(),
+            'updated_at'=>$this->faker->dateTime(),
         ];
     }
 }
