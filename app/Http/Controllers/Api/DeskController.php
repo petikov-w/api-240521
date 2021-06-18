@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\DeskResource;
+use App\Http\Requests\DeskStoreRequest;
 use App\Models\Desk;
 use Illuminate\Http\Request;
 
@@ -15,7 +17,7 @@ class DeskController extends Controller
      */
     public function index()
     {
-        return Desk::all();
+        return  response()->json(DeskResource::collection(Desk::all()));
     }
 
     /**
@@ -24,9 +26,10 @@ class DeskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(DeskStoreRequest $request)
     {
-        //
+        $created_desk = Desk::create($request->validated());
+        return new DeskResource($created_desk);
     }
 
     /**
@@ -37,7 +40,7 @@ class DeskController extends Controller
      */
     public function show($id)
     {
-        return Desk::find($id);
+        return new DeskResource(Desk::findOrFail($id));
     }
 
     /**
@@ -47,9 +50,10 @@ class DeskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(DeskStoreRequest $request, Desk $desk)
     {
-        //
+        $desk->update($request->validated());
+        return new DeskResource($desk);
     }
 
     /**
@@ -60,6 +64,22 @@ class DeskController extends Controller
      */
     public function destroy($id)
     {
-        //
+       // $desk->delete();
+       //return response(null,Response::HTTP_NO_CONTENT);
+        $desk = Desk::destroy($id);
+       //  dd($id);
+        if (!$desk) {
+            return response()->json([
+                "status" => false,
+                "message" => "Desk not found"
+            ])->setStatusCode(404,"Desk not found");
+        } else {
+            return response()->json([
+                "status" => true,
+                "message" => "Desk is delete"
+            ])->setStatusCode(200,"Desk is delete");
+        }
+
+
     }
 }
